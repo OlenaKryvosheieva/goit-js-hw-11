@@ -21,49 +21,52 @@ loadMoreBtn.button.addEventListener('click', fetchData);
 function onSubmit(e) {
   e.preventDefault();
 
+  loadMoreBtn.hide();
+
   const form = e.currentTarget;
   const value = form.elements.searchQuery.value.trim();
   apiService.query = value;
+
   clearGallery();
   apiService.resetPage();
 
-  loadMoreBtn.show();
-
-  fetchData().finally(() => form.reset());
+  fetchData();
+  form.reset();
 }
 
-function fetchData() {
-  loadMoreBtn.disable();
-  let currentHits = apiService.currentHits();
-  // console.log(currentHits);
+async function fetchData() {
+  try {
+    let currentHits = apiService.currentHits();
 
-  return apiService
-    .getData()
-    .then(({ hits, totalHits }) => {
-      if (!hits.length) {
-        loadMoreBtn.hide();
-        Notify.failure(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-        return;
-      }
+    const { hits, totalHits } = await apiService.getData();
 
-      const markup = hits.reduce(
-        (markup, hit) => createMarkup(hit) + markup,
-        ''
+    if (apiService.query === '') {
+      loadMoreBtn.hide();
+      Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
       );
-      appendToGallery(markup);
+      return;
+    }
 
-      if (currentHits >= totalHits) {
-        loadMoreBtn.hide();
-        Notify.info(
-          "We're sorry, but you've reached the end of search results."
-        );
-        return '';
-      }
+    if (!hits.length) {
+      loadMoreBtn.hide();
+      Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      return;
+    }
 
-      loadMoreBtn.enable();
-    })
+    const markup = hits.reduce((markup, hit) => createMarkup(hit) + markup, '');
+    appendToGallery(markup);
 
-    .catch(console.log);
+    if (currentHits >= totalHits) {
+      loadMoreBtn.hide();
+      Notify.info("We're sorry, but you've reached the end of search results.");
+      return '';
+    }
+
+    loadMoreBtn.show();
+  } catch (error) {
+    console.log(error);
+  }
 }

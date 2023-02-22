@@ -51,6 +51,10 @@ button {
   background-color: cornflowerblue;
 }
 
+button:hover {
+  background-color: rgb(35, 110, 249);
+}
+
 button.hidden {
   display: none;
 }
