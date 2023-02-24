@@ -23,24 +23,28 @@ function onSubmit(e) {
 
   loadMoreBtn.hide();
 
-  const form = e.currentTarget;
-  const value = form.elements.searchQuery.value.trim();
+  // const form = e.currentTarget;
+  // const value = form.elements.searchQuery.value.trim();
 
-  if (!value) {
+  // const form = e.currentTarget;
+  const inputValue = e.target.elements.searchQuery.value.trim();
+
+  if (!inputValue) {
     loadMoreBtn.hide();
+    clearGallery();
     Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
     return;
   }
 
-  apiService.query = value;
+  apiService.query = inputValue;
 
   clearGallery();
   apiService.resetPage();
 
   fetchData();
-  form.reset();
+  refs.form.reset();
 }
 
 async function fetchData() {
