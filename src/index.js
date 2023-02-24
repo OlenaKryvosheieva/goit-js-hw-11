@@ -25,6 +25,15 @@ function onSubmit(e) {
 
   const form = e.currentTarget;
   const value = form.elements.searchQuery.value.trim();
+
+  if (!value) {
+    loadMoreBtn.hide();
+    Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+    return;
+  }
+
   apiService.query = value;
 
   clearGallery();
@@ -39,14 +48,6 @@ async function fetchData() {
     let currentHits = apiService.currentHits();
 
     const { hits, totalHits } = await apiService.getData();
-
-    if (apiService.query === '') {
-      loadMoreBtn.hide();
-      Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-      return;
-    }
 
     if (!hits.length) {
       loadMoreBtn.hide();
